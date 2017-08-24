@@ -1,0 +1,4 @@
+name = Name
+age = Age
+validation.errors = Erreur de saisie
+send = Valider

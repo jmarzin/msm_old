@@ -1,0 +1,47 @@
+@(form: Form[Gpx], id: Option[Long] = None)(implicit session: Session, flash: Flash, messages: Messages)
+
+@main() {
+  <div class="container">
+    <h2></h2>
+    @helper.form(action = id.map(routes.GpxController.updateGpx(_)).getOrElse(routes.GpxController.saveGpx), 'enctype -> "multipart/form-data") {
+      <fieldset>
+        <div hidden>
+          @helper.inputText(form("id"))
+          @helper.inputText(form("idTrek"))
+          @helper.inputText(form("listeMatos"))
+          @helper.inputText(form("depart"))
+          @helper.inputText(form("arrivee"))
+          @helper.inputText(form("coordonneesPix"))
+          @helper.inputText(form("typegpx"))
+        </div>
+        @helper.inputText(form("titre"), 'size -> 50)
+        @helper.inputText(form("sousTitre"), 'size -> 50)
+        @helper.inputText(form("heureDebut"))
+        @helper.inputText(form("heureFin"))
+        @helper.inputText(form("altitudeMinimum"))
+        @helper.inputText(form("altitudeMaximum"))
+        @helper.inputText(form("ascensionTotale"))
+        @helper.inputText(form("descenteTotale"))
+        @helper.inputText(form("distanceTotale"))
+        @helper.select(form("nomFichier")
+          , ("","") +: new java.io.File("%s/public/gpx/randos/"
+                  .format(System.getenv("PWD"))).listFiles.map(f => f.getName).filter(_.toLowerCase.endsWith(".gpx")).map(f => (f,f)).toSeq))
+        <input name="monFichier" type="file">
+        @helper.textarea(form("description"), 'id -> "mytextarea", 'rows -> 15, 'cols -> 100)
+      </fieldset>
+      <button type="submit" class="btn btn-primary">
+      @id.map(_=> "Modifier").getOrElse("Créer")
+      </button>
+    }
+  </div>
+  <script type="text/javascript">
+          tinymce.init({
+            selector: '#mytextarea',
+            plugins: [
+              'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
+              'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
+              'save table contextmenu directionality emoticons template paste textcolor'
+            ]
+          });
+  </script>
+}

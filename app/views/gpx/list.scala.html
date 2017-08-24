@@ -1,0 +1,56 @@
+@(gpxs : Seq[Gpx])(implicit session: Session, flash: Flash, request: RequestHeader)
+@import org.joda.time.DateTime
+@import org.joda.time.format.DateTimeFormat
+@import org.joda.time.format.DateTimeFormatter
+@main() {
+    <div class="container">
+        @if(session.get("admin") == Some("true")) {
+            <a type="button" class="btn btn-link fa fa-plus" href="@routes.GpxController.newGpx"></a>
+        }
+        <div class="row">
+                @for(gpx <- gpxs) {
+                    <div class="col-md-4 child">
+                        <div class="card text-center">
+                            <div class="card-block">
+                                <h3 class="card-title">@gpx.titre</h3>
+                            @*</div>*@
+                            <h6 class="card-subtitle mb-3"><small>@gpx.sousTitre</small></h6>
+                            @*<div class="card-block">*@
+                                <div class="card-text">
+                                    <div id="mapid@gpx.id" class="mapidL"></div>
+                                </div>
+                                <p> @(gpx.distanceTotale/1000f) km +@gpx.ascensionTotale m -@gpx.descenteTotale m <br> le
+                                    @defining(new DateTime(gpx.heureDebut)) { d =>
+                                        @DateTimeFormat.forPattern("d MMMM yyyy").print(d)
+                                    }
+                                </p>
+                                <a href="@routes.GpxController.showGpx(gpx.id)" class="btn btn-primary">En savoir plus</a>
+                            </div>
+                            <script>
+                                var mymap@gpx.id = L.map('mapid@gpx.id')
+                                var hikebikemapUrl@gpx.id = 'http://{s}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png';
+                                var hikebikemapAttribution@gpx.id = 'Map Data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+                                var hikebikemap@gpx.id = new L.TileLayer(hikebikemapUrl@gpx.id, {maxZoom: 17, attribution: hikebikemapAttribution@gpx.id});
+                                (hikebikemap@gpx.id).addTo(mymap@gpx.id);
+                                var customLayer = L.geoJson(null, {
+                                    // http://leafletjs.com/reference.html#geojson-style
+                                    style: function(feature) {
+                                        return { color: '#f00' };
+                                    }
+                                });
+                                @if(gpx.typegpx == "R") {
+                                    var runLayer@gpx.id = omnivore.gpx('@routes.Assets.at("gpx/randos/" + gpx.nomFichier)', null, customLayer)
+                                } else {
+                                    var runLayer@gpx.id = omnivore.gpx('@routes.Assets.at("gpx/treks/" + gpx.nomFichier)', null, customLayer)
+                                }
+                                        .on('ready', function() {
+                                            (mymap@gpx.id).fitBounds((runLayer@gpx.id).getBounds());
+                                        })
+                                        .addTo(mymap@gpx.id);
+                            </script>
+                        </div>
+                    </div>
+                }
+        </div>
+    </div>
+}

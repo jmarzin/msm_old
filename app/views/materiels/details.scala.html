@@ -1,0 +1,31 @@
+@(materiel : Materiel)(implicit session: Session, flash: Flash, request: RequestHeader)
+@main() {
+    <div class="container">
+        <div class="col-md-12 mt-2">
+            <div class="card">
+                <div class="card-block">
+                    <h3 class="card-title">@materiel.nom</h3>
+                </div>
+                <h6 class="card-subtitle ml-4 mb-3">@materiel.poids g</h6>
+                <div class="row">
+                    <div class="col-md-3" child>
+                        <img class="card-img-top img-fluid"
+                        src="@routes.Assets.at("images/matos/" + materiel.photo)"
+                        alt="@materiel.nom">
+                    </div>
+                </div>
+                <div class="card-block">
+                    @Html(materiel.description)
+                </div>
+                @if(session.data.getOrElse("admin","") == "true") {
+                    <div class="card-footer">
+                        <a type="button" class="btn btn-link fa fa-trash"
+                            href="@routes.MaterielController.deleteMateriel(materiel.id)" onclick="deleteDialog(event)"></a>
+                        <a type="button" class="btn btn-link fa fa-pencil"
+                            href="@routes.MaterielController.editMateriel(materiel.id)"></a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

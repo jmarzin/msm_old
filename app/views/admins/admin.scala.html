@@ -1,0 +1,12 @@
+@(adminForm: Form[Admin])(implicit session: play.api.mvc.Session, flash: Flash, messages: Messages)
+
+@main() {
+    @helper.form(action = routes.Admins.checkPassword()) {
+        <fieldset>
+            @helper.inputPassword(adminForm("password"),
+            'autofocus -> "true")
+        </fieldset>
+        <p><input type="submit" class="btn primary"
+        value='@Messages("send")'></p>
+    }
+}

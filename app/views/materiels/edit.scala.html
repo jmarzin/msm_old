@@ -1,0 +1,38 @@
+@(form: Form[Materiel], id: Option[Long] = None)(implicit session: Session, flash: Flash, messages: Messages)
+
+@main() {
+    <div class="container">
+        <h2></h2>
+        @helper.form(action = id.map(routes.MaterielController.updateMateriel(_)).getOrElse(routes.MaterielController.saveMateriel()), 'enctype -> "multipart/form-data") {
+            <fieldset>
+                <div hidden>@helper.inputText(form("id"))</div>
+                @helper.inputText(form("nom"), 'size -> 100)
+                @helper.textarea(form("description"), 'id -> "mytextarea", 'rows -> 15, 'cols -> 100)
+                <div class="row">
+                    <div class="col-md-3" child>
+                        <img class="img-fluid rounded mb-3 mb-md-0" src="@routes.Assets.at("images/matos/" + form.data("photo")) "
+                            alt="photo du matériel">
+                    </div>
+                </div>
+                @helper.select(form("photo")
+                    ,new java.io.File("%s/public/images/matos/"
+                            .format(System.getenv("PWD"))).listFiles.map(f => f.getName).filter(_.toLowerCase.endsWith(".jpg")).map(f => (f,f)).toSeq)
+                <input name="monFichier" type="file">
+                @helper.inputText(form("poids"))
+            </fieldset>
+            <button type="submit" class="btn btn-primary">
+                @id.map(_=> "Modifier").getOrElse("Créer")
+            </button>
+        }
+    </div>
+    <script type="text/javascript">
+            tinymce.init({
+                selector: '#mytextarea',
+                plugins: [
+                    'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
+                    'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
+                    'save table contextmenu directionality emoticons template paste textcolor'
+                ]
+            });
+    </script>
+}

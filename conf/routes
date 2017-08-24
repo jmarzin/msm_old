@@ -1,0 +1,31 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET        /                      controllers.Application.index
+GET        /materiels/list        controllers.MaterielController.listMateriel
+GET        /materiels/new         controllers.MaterielController.newMateriel
+POST       /materiels             controllers.MaterielController.saveMateriel
+GET        /materiels/:id/supp    controllers.MaterielController.deleteMateriel(id: Long)
+GET        /materiels/:id/edit    controllers.MaterielController.editMateriel(id: Long)
+POST       /materiels/:id         controllers.MaterielController.updateMateriel(id: Long)
+PUT        /materiels/:id         controllers.MaterielController.updateMateriel(id: Long)
+GET        /materiels/:id         controllers.MaterielController.showMateriel(id: Long)
+
+GET        /gpx/list/:typegpx     controllers.GpxController.listGpx(typegpx: String)
+GET        /gpx/list/:typegpx     controllers.GpxController.listGpx(typegpx: String)
+GET        /gpx/list/trek/:id     controllers.GpxController.listGpxTrk(id: Long)
+GET        /gpx/new               controllers.GpxController.newGpx
+POST       /gpx                   controllers.GpxController.saveGpx
+GET        /gpx/:id/supp          controllers.GpxController.deleteGpx(id: Long)
+GET        /gpx/:id               controllers.GpxController.showGpx(id: Long)
+GET        /gpx/:id/edit          controllers.GpxController.editGpx(id: Long)
+POST       /gpx/:id               controllers.GpxController.updateGpx(id: Long)
+PUT        /gpx/:id               controllers.GpxController.updateGpx(id: Long)
+
+GET        /admin                 controllers.Admins.password
+POST       /admin                 controllers.Admins.checkPassword
+
+# Map static resources from the /public folder to the /assets URL path
+GET        /assets/*file          controllers.Assets.at(path="/public", file)
