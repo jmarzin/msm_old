@@ -8,7 +8,7 @@ import play.api.mvc.{MultipartFormData, Request}
 trait UtilUpload {
 
   def uploadFile(item: String, fichier: String, request: Request[MultipartFormData[Files.TemporaryFile]]) : String = {
-    val nomImage = request.body.file("monFichier").map { monFichier =>
+    val nomFichier = request.body.file("monFichier").map { monFichier =>
       if (monFichier.filename.isEmpty) {
         fichier
       } else {
@@ -23,6 +23,6 @@ trait UtilUpload {
         monFichier.filename
       }
     }.getOrElse(fichier)
-    nomImage
+    nomFichier
   }
 }

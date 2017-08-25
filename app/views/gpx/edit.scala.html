@@ -1,5 +1,4 @@
-@(form: Form[Gpx], id: Option[Long] = None)(implicit session: Session, flash: Flash, messages: Messages)
-
+@(form: Form[GpxForm], id: Option[Long] = None, listeCandidats: Seq[(Long, String, Long)] = null)(implicit session: Session, flash: Flash, messages: Messages)
 @main() {
   <div class="container">
     <h2></h2>
@@ -13,6 +12,7 @@
           @helper.inputText(form("arrivee"))
           @helper.inputText(form("coordonneesPix"))
           @helper.inputText(form("typegpx"))
+          @helper.inputText(form("nomFichier"))
         </div>
         @helper.inputText(form("titre"), 'size -> 50)
         @helper.inputText(form("sousTitre"), 'size -> 50)
@@ -23,10 +23,31 @@
         @helper.inputText(form("ascensionTotale"))
         @helper.inputText(form("descenteTotale"))
         @helper.inputText(form("distanceTotale"))
-        @helper.select(form("nomFichier")
-          , ("","") +: new java.io.File("%s/public/gpx/randos/"
-                  .format(System.getenv("PWD"))).listFiles.map(f => f.getName).filter(_.toLowerCase.endsWith(".gpx")).map(f => (f,f)).toSeq))
-        <input name="monFichier" type="file">
+        @if(form("typegpx").value.getOrElse("R") == "R") {
+          <dt><label for="fichierActuel">fichier serveur actuel</label></dt>
+          @defining(form("nomFichier").value.getOrElse("aucun")) { nomFic =>
+            <dd id="fichierActuel">@if(nomFic.isEmpty) {aucun} else {@nomFic}</dd>
+          }
+          @helper.select(form("listeFichiers"),
+            listeCandidats.map(f => (f._2, f._2)), '_label -> "nouveau fichier serveur")
+          <dt><label for="monFichier">nouveau fichier local</label></dt>
+          <dd><input id="monFichier" name="monFichier" type="file"></dd>
+        } else {
+          <dl class=" " id="listeFichiers_field">
+            <dt><label for="listeFichiers">listeFichiers</label></dt>
+            <dd>
+              <select id="listeFichiers" name="listeFichiers[]" multiple="multiple">
+                @for(f <- listeCandidats) {
+                  @if(f._3.toString == form("id").value.get) {
+                    <option value="@f._1.toString,@f._2" selected>@f._2</option>
+                    } else {
+                    <option value="@f._1.toString,@f._2">@f._2</option>
+                  }
+                }
+              </select>
+            </dd>
+          </dl>
+        }
         @helper.textarea(form("description"), 'id -> "mytextarea", 'rows -> 15, 'cols -> 100)
       </fieldset>
       <button type="submit" class="btn btn-primary">
@@ -35,13 +56,6 @@
     }
   </div>
   <script type="text/javascript">
-          tinymce.init({
-            selector: '#mytextarea',
-            plugins: [
-              'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
-              'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
-              'save table contextmenu directionality emoticons template paste textcolor'
-            ]
-          });
+      editeur()
   </script>
 }

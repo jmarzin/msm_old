@@ -1,11 +1,11 @@
-@(gpxs : Seq[Gpx])(implicit session: Session, flash: Flash, request: RequestHeader)
+@(gpxs : Seq[Gpx], typegpx: String)(implicit session: Session, flash: Flash, request: RequestHeader)
 @import org.joda.time.DateTime
 @import org.joda.time.format.DateTimeFormat
 @import org.joda.time.format.DateTimeFormatter
 @main() {
     <div class="container">
         @if(session.get("admin") == Some("true")) {
-            <a type="button" class="btn btn-link fa fa-plus" href="@routes.GpxController.newGpx"></a>
+            <a type="button" class="btn btn-link fa fa-plus" href="@routes.GpxController.newGpx(typegpx)"></a>
         }
         <div class="row">
                 @for(gpx <- gpxs) {
@@ -38,10 +38,8 @@
                                         return { color: '#f00' };
                                     }
                                 });
-                                @if(gpx.typegpx == "R") {
-                                    var runLayer@gpx.id = omnivore.gpx('@routes.Assets.at("gpx/randos/" + gpx.nomFichier)', null, customLayer)
-                                } else {
-                                    var runLayer@gpx.id = omnivore.gpx('@routes.Assets.at("gpx/treks/" + gpx.nomFichier)', null, customLayer)
+                                @defining(if(gpx.typegpx == "R")"gpx/randos/" + gpx.nomFichier else "gpx/treks/" +gpx.nomFichier) { fichier =>
+                                    var runLayer@gpx.id = omnivore.gpx('@routes.Assets.at(fichier)', null, customLayer)
                                 }
                                         .on('ready', function() {
                                             (mymap@gpx.id).fitBounds((runLayer@gpx.id).getBounds());

@@ -16,7 +16,7 @@ GET        /materiels/:id         controllers.MaterielController.showMateriel(id
 GET        /gpx/list/:typegpx     controllers.GpxController.listGpx(typegpx: String)
 GET        /gpx/list/:typegpx     controllers.GpxController.listGpx(typegpx: String)
 GET        /gpx/list/trek/:id     controllers.GpxController.listGpxTrk(id: Long)
-GET        /gpx/new               controllers.GpxController.newGpx
+GET        /gpx/new/:typegpx      controllers.GpxController.newGpx(typegpx: String)
 POST       /gpx                   controllers.GpxController.saveGpx
 GET        /gpx/:id/supp          controllers.GpxController.deleteGpx(id: Long)
 GET        /gpx/:id               controllers.GpxController.showGpx(id: Long)

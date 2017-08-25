@@ -55,9 +55,16 @@ class GpxRep @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: E
     Await.result(fut, 2.seconds)
   }
 
+  def annuleTrek(id: Long): Int = {
+    val query = gpxs.filter(_.idTrek === id).map(g => g.idTrek)
+    val fut = db.run(query.update(0L))
+    Await.result(fut, 2.seconds)
+  }
+
   def removeById(id: Long): Int = {
     val fut = db.run(gpxs.filter(_.id === id).delete)
     Await.result(fut, 2.seconds)
+    annuleTrek(id)
   }
 
   def get(id: Long): Option[Gpx] = {
@@ -90,6 +97,37 @@ class GpxRep @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: E
   def listByTrekId(id: Long): Seq[Gpx] = {
     val fut= db.run(gpxs.filter(_.idTrek === id).result)
     Await.result(fut, 2.seconds)
+  }
+
+  def listCandidatTrek(id: Long): Seq[(Long, String, Long)] = {
+    val fut = db.run(gpxs.filter(g => g.typegpx === "R" && (g.idTrek === 0L || g.idTrek === id)).
+      map(g => (g.id, g.nomFichier, g.idTrek)).result)
+    Await.result(fut, 2.seconds)
+  }
+
+  def lastValueIndex: Long = {
+    val fut = db.run(sql"""select last_value from gpx_id_seq""".as[Long])
+    Await.result(fut, 2.seconds).head
+  }
+
+  def listGpxFiles: Seq[String] = {
+    val fut = db.run(gpxs.filter(_.typegpx === "R").map(f => f.nomFichier).result)
+    Await.result(fut, 2.seconds)
+  }
+
+  def rattacheGpx(idTrek: Long, listeFichiers: Seq[Long]): Unit = {
+    val query = gpxs.
+      filter(_.idTrek === idTrek).
+      map(g => g.idTrek)
+    val fut = db.run(query.update(0L))
+    Await.result(fut, 2.seconds)
+    for(f <- listeFichiers) {
+      val query = gpxs.
+        filter(_.id === f).
+        map(g => g.idTrek)
+      val fut = db.run(query.update(idTrek))
+      Await.result(fut, 2.seconds)
+    }
   }
 }
 

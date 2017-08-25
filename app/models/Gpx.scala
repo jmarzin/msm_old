@@ -62,8 +62,7 @@ object Gpx {
     s
   }
 
-  def creer(id: Long, idTrek: Long, titre: String, sousTitre: String, description: String, listeMatos: String, filename: String): Gpx = {
-    var nom: String = ""
+  def creer(typegxp: String, id: Long, idTrek: Long, titre: String, sousTitre: String, description: String, listeMatos: String, filename: String): Gpx = {
     var xml: Elem = null
     var altitudes: Seq[Seq[Double]] = Seq()
     var altitudesPix: Seq[Seq[Int]] = Seq()
@@ -80,8 +79,9 @@ object Gpx {
     var arrivee: (BigDecimal, BigDecimal) = (0, 0)
     var coordonneesPix: Seq[Seq[(Int, Int)]] = Seq()
 
-    nom = filename
-    xml = XML.loadFile("public/gpx/randos/%s".format(filename))
+    val racine = if(typegxp == "R") "public/gpx/randos/" else "public/gpx/treks/"
+
+    xml = XML.loadFile(racine + filename)
     var ini = 0D
     for(trk <- xml \\ "trk") {
       val alt = (trk \\ "ele").map(_.text.toDouble)
@@ -117,9 +117,9 @@ object Gpx {
     for(i <- altitudesPix.indices) {
       coordonneesPix +:= (distancesCumuleesPix(i) zip altitudesPix(i)).distinct
     }
-    new Gpx(id, idTrek, titre, sousTitre, description, listeMatos, nom,altitudeMinimum,altitudeMaximum,
-      ascensionTotale,descenteTotale,heureDebut,heureFin,
-      distanceTotale,"%s,%s".format(depart._1,depart._2),"%s,%s".format(arrivee._1,arrivee._2),
+    new Gpx(id, idTrek, titre, sousTitre, description, listeMatos, filename, altitudeMinimum, altitudeMaximum,
+      ascensionTotale, descenteTotale, heureDebut, heureFin,
+      distanceTotale, "%s,%s".format(depart._1, depart._2), "%s,%s".format(arrivee._1, arrivee._2),
       { var html = ""
         for(trace <- coordonneesPix) {
           html += "<polyline points=\""
@@ -130,7 +130,7 @@ object Gpx {
         }
         html
       },
-      "R")
+      typegxp)
   }
 
   def fusion(listeFichiersGpx: Seq[String], fichierGpxResultat: String) : Unit = {
