@@ -5,7 +5,7 @@
 # Home page
 GET        /                      controllers.Application.index
 
-POST       /uploadimage          controllers.Application.upLoadImage
+POST       /uploadimage           controllers.Admins.upLoadImage
 
 
 GET        /materiels/list        controllers.MaterielController.listMateriel

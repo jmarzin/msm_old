@@ -20,20 +20,7 @@ class Application extends Controller {
     Ok(views.html.index(ecartRetraite, ecartDepart))
   }
 
-  def upLoadImage = Action(parse.multipartFormData) {implicit request =>
-    val reponse = request.body.file("file").map { monFichier =>
-      if (monFichier.filename.isEmpty) {
-        "{}"
-      } else {
-        val contentType = monFichier.contentType
-        val fichierServeur = new File("%s/public/images/%s"
-          .format(System.getenv("PWD"), monFichier.filename))
-        monFichier.ref.moveTo(fichierServeur)
-        """{"location" : "/assets/images/%s"}""".format(monFichier.filename)
-      }
-    }.getOrElse("{}")
-    Ok(Json.parse(reponse))
-  }
+
 //  def upload(request):
 //  form = myForm(request.POST, request.FILES)
 //  if form.is_valid():

@@ -1,5 +1,7 @@
 package controllers
 
+import java.io.File
+
 import akka.util.Crypt._
 import models.Admin
 import play.api.data.Form
@@ -8,6 +10,7 @@ import play.api.i18n.Messages
 import play.api.mvc.{Action, Controller, Flash}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import play.api.libs.json.Json
 
 /**
  * Created by jacques on 25/02/15.
@@ -46,5 +49,20 @@ class Admins extends Controller{
           .withSession(request.session - "admin" + ("admin" -> "true"))
       }
     )
+  }
+
+  def upLoadImage = Action(parse.multipartFormData) {implicit request =>
+    val reponse = request.body.file("file").map { monFichier =>
+      if (monFichier.filename.isEmpty) {
+        "{}"
+      } else {
+        val contentType = monFichier.contentType
+        val fichierServeur = new File("%s/public/images/%s"
+          .format(System.getenv("PWD"), monFichier.filename))
+        monFichier.ref.moveTo(fichierServeur)
+        """{"location" : "/assets/images/%s"}""".format(monFichier.filename)
+      }
+    }.getOrElse("{}")
+    Ok(Json.parse(reponse))
   }
 }
