@@ -49,10 +49,6 @@
           </dl>
         }
         @helper.textarea(form("description"), 'id -> "mytextarea", 'rows -> 15, 'cols -> 100)
-        <form id="my_form" action="/upload/" target="form_target" method="post" enctype="multipart/form-data" style="width:0px;height:0;overflow:hidden">
-            <input name="image" id="picker" style="overflow:hidden" type="file" onchange="$('#my_form').submit();this.value='';">
-        </form>
-
       </fieldset>
       <button type="submit" class="btn btn-primary">
       @id.map(_=> "Modifier").getOrElse("Créer")

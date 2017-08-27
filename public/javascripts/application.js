@@ -15,9 +15,7 @@ function editeur() {
             'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
             'save table contextmenu directionality emoticons template paste textcolor'
         ],
-        file_picker_callback: function(callback, value, meta) {
-            if(meta.filetype == 'image')
-                $('#picker').trigger( "click" );
-        }
+        images_upload_url: '/uploadimage',
+        automatic_uploads: true
     });
 }

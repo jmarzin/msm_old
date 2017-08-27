@@ -4,6 +4,10 @@
 
 # Home page
 GET        /                      controllers.Application.index
+
+POST       /uploadimage          controllers.Application.upLoadImage
+
+
 GET        /materiels/list        controllers.MaterielController.listMateriel
 GET        /materiels/new         controllers.MaterielController.newMateriel
 POST       /materiels             controllers.MaterielController.saveMateriel
