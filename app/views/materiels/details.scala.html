@@ -1,6 +1,12 @@
 @(materiel : Materiel)(implicit session: Session, flash: Flash, request: RequestHeader)
 @main() {
     <div class="container">
+        @if(session.data.getOrElse("admin","") == "true") {
+            <a type="button" class="btn btn-link fa fa-trash"
+            href="@routes.MaterielController.deleteMateriel(materiel.id)" onclick="deleteDialog(event)"></a>
+            <a type="button" class="btn btn-link fa fa-pencil"
+            href="@routes.MaterielController.editMateriel(materiel.id)"></a>
+        }
         <div class="col-md-12 mt-2">
             <div class="card">
                 <div class="card-block">
@@ -10,21 +16,14 @@
                 <div class="row">
                     <div class="col-md-3" child>
                         <img class="card-img-top img-fluid"
-                        src="@routes.Assets.at("images/matos/" + materiel.photo)"
+                        src="@routes.Assets.at("contenu/images/matos/" + materiel.photo)"
                         alt="@materiel.nom">
                     </div>
                 </div>
                 <div class="card-block">
                     @Html(materiel.description)
                 </div>
-                @if(session.data.getOrElse("admin","") == "true") {
-                    <div class="card-footer">
-                        <a type="button" class="btn btn-link fa fa-trash"
-                            href="@routes.MaterielController.deleteMateriel(materiel.id)" onclick="deleteDialog(event)"></a>
-                        <a type="button" class="btn btn-link fa fa-pencil"
-                            href="@routes.MaterielController.editMateriel(materiel.id)"></a>
-                    </div>
-                }
+
             </div>
         </div>
     </div>

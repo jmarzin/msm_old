@@ -17,6 +17,6 @@ libraryDependencies += "org.postgresql" % "postgresql" % "9.3-1100-jdbc4"
 
 libraryDependencies += "com.h2database" % "h2" % "1.4.194"
 
-unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
+//unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
 
       

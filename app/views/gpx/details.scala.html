@@ -91,19 +91,19 @@
                 }
             });
             var departIcon = L.icon({
-                iconUrl: '@routes.Assets.at("images/departS.png")',
+                iconUrl: '@routes.Assets.at("contenu/images/departS.png")',
                 iconSize:     [40, 40],
                 iconAnchor:   [15, 37]
             });
             var arriveeIcon = L.icon({
-                iconUrl: '@routes.Assets.at("images/arriveeS.png")',
+                iconUrl: '@routes.Assets.at("contenu/images/arriveeS.png")',
                 iconSize:     [40, 40],
                 iconAnchor:   [36, 39]
             });
             @if(gpx.typegpx == "R") {
-                    var runLayer = omnivore.gpx('@routes.Assets.at("gpx/randos/" + gpx.nomFichier)', null, customLayer)
+                    var runLayer = omnivore.gpx('@routes.Assets.at("contenu/gpx/randos/" + gpx.nomFichier)', null, customLayer)
                 } else {
-                    var runLayer = omnivore.gpx('@routes.Assets.at("gpx/treks/" + gpx.nomFichier)', null, customLayer)
+                    var runLayer = omnivore.gpx('@routes.Assets.at("contenu/gpx/treks/" + gpx.nomFichier)', null, customLayer)
                 }
                     .on('ready', function() {
                         mymap.fitBounds(runLayer.getBounds());

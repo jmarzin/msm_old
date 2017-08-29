@@ -38,7 +38,7 @@
                                         return { color: '#f00' };
                                     }
                                 });
-                                @defining(if(gpx.typegpx == "R")"gpx/randos/" + gpx.nomFichier else "gpx/treks/" +gpx.nomFichier) { fichier =>
+                                @defining(if(gpx.typegpx == "R")"contenu/gpx/randos/" + gpx.nomFichier else "contenu/gpx/treks/" +gpx.nomFichier) { fichier =>
                                     var runLayer@gpx.id = omnivore.gpx('@routes.Assets.at(fichier)', null, customLayer)
                                 }
                                         .on('ready', function() {

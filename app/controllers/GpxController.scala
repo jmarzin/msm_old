@@ -6,6 +6,7 @@ import javax.inject.Inject
 import dal.GpxRep
 import models.{Gpx, Materiel}
 import org.joda.time.DateTime
+import play.Environment
 import play.api.mvc.{Action, Controller, Flash}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.data.Form
@@ -84,7 +85,7 @@ class GpxController @Inject() (repo: GpxRep, val messagesApi: MessagesApi)
       Redirect(routes.GpxController.showGpx(id)).flashing("warning" -> "Vous n'êtes pas administrateur")
     } else {
       repo.removeById(id)
-      Redirect(routes.GpxController.listGpx("R")).flashing("success" -> "Mot supprimé")
+      Redirect(routes.GpxController.listGpx("R")).flashing("success" -> "Tracé supprimé")
     }
   }
 
@@ -101,8 +102,10 @@ class GpxController @Inject() (repo: GpxRep, val messagesApi: MessagesApi)
             listeFichiers.map(f => f._1.toString + "," + f._2)))
       }
       if(typegpx == "R") {
-        val liste = ("" +: new java.io.File("%s/public/gpx/randos/".format(System.getenv("PWD")))
-          .listFiles.map(f => f.getName).filter(_.toLowerCase.endsWith(".gpx")).toSeq).diff(repo.listGpxFiles)
+        val liste = ("" +: new java.io.File("%s/contenu/gpx/randos/".
+          format(Environment.simple.rootPath.getCanonicalPath)).
+          listFiles.map(f => f.getName).filter(_.toLowerCase.endsWith(".gpx")).
+          toSeq).diff(repo.listGpxFiles)
         listeFichiers = liste.map((0L, _, 0L))
       } else {
         listeFichiers = repo.listCandidatTrek(0L).sortWith(_._2 < _._2)
@@ -150,7 +153,7 @@ class GpxController @Inject() (repo: GpxRep, val messagesApi: MessagesApi)
             repo.rattacheGpx(idx, listeFichiers.map(_._1.toLong))
           }
           Redirect(routes.GpxController.showGpx(idx))
-            .flashing("success" -> ("Création réussie du tracé Gpx " + idx.toString))
+            .flashing("success" -> ("Création réussie du tracé " + idx.toString))
         }
       )
     }
@@ -163,7 +166,8 @@ class GpxController @Inject() (repo: GpxRep, val messagesApi: MessagesApi)
       var listeFichiers = Seq[(Long, String, Long)]()
       repo.get(id).map { gpx =>
         if(gpx.typegpx == "R") {
-          val liste = ("" +: new java.io.File("%s/public/gpx/randos/".format(System.getenv("PWD")))
+          val liste = ("" +: new java.io.File("%s/contenu/gpx/randos/".
+            format(Environment.simple.rootPath.getCanonicalPath))
             .listFiles.map(f => f.getName).filter(_.toLowerCase.endsWith(".gpx")).toSeq).diff(repo.listGpxFiles)
           listeFichiers = liste.map((0L, _, 0L))
         } else {
@@ -219,7 +223,7 @@ class GpxController @Inject() (repo: GpxRep, val messagesApi: MessagesApi)
             }
           }
           Redirect(routes.GpxController.showGpx(gpx.id))
-              .flashing("success" -> ("Modification réussie du matériel " + id.toString))
+              .flashing("success" -> ("Modification réussie du tracé " + id.toString))
         }
       )
     }

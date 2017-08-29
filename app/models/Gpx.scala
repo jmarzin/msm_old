@@ -1,6 +1,7 @@
 package models
 
 import org.joda.time.DateTime
+import play.Environment
 import play.api.libs.json.Json
 
 import scala.xml.{Elem, XML}
@@ -79,7 +80,11 @@ object Gpx {
     var arrivee: (BigDecimal, BigDecimal) = (0, 0)
     var coordonneesPix: Seq[Seq[(Int, Int)]] = Seq()
 
-    val racine = if(typegxp == "R") "public/gpx/randos/" else "public/gpx/treks/"
+    val racine = if(typegxp == "R") {
+      "%s/contenu/gpx/randos/".format(Environment.simple.rootPath.getAbsolutePath)
+    } else {
+      "%s/contenu/gpx/treks/".format(Environment.simple.rootPath.getAbsolutePath)
+    }
 
     xml = XML.loadFile(racine + filename)
     var ini = 0D
@@ -136,7 +141,7 @@ object Gpx {
   def fusion(listeFichiersGpx: Seq[String], fichierGpxResultat: String) : Unit = {
     var resultat = ""
     for(fichier <- listeFichiersGpx) {
-      val xml = XML.loadFile("public/gpx/randos/%s".format(fichier))
+      val xml = XML.loadFile("%s/contenu/gpx/randos/%s".format(Environment.simple.rootPath.getAbsolutePath, fichier))
       if(resultat == ""){
         resultat = xml.toString()
       } else {

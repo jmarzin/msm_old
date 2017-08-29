@@ -1,9 +1,13 @@
 package controllers
 
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.attribute.PosixFilePermissions
 
+import sys.process._
 import akka.util.Crypt._
 import models.Admin
+import play.Environment
 import play.api.data.Form
 import play.api.data.Forms.{ignored, mapping, nonEmptyText, single}
 import play.api.i18n.Messages
@@ -11,6 +15,8 @@ import play.api.mvc.{Action, Controller, Flash}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.libs.json.Json
+
+import scala.reflect.io.{File, Path}
 
 /**
  * Created by jacques on 25/02/15.
@@ -57,10 +63,18 @@ class Admins extends Controller{
         "{}"
       } else {
         val contentType = monFichier.contentType
-        val fichierServeur = new File("%s/public/images/%s"
-          .format(System.getenv("PWD"), monFichier.filename))
-        monFichier.ref.moveTo(fichierServeur)
-        """{"location" : "/assets/images/%s"}""".format(monFichier.filename)
+        var fichierServeur = new java.io.File("%s/contenu/images/%s"
+          .format(Environment.simple.rootPath.getCanonicalPath, monFichier.filename.replaceAll(" ","_")))
+        monFichier.ref.moveTo(fichierServeur, true)
+        fichierServeur.setReadable(true, false)
+        fichierServeur.setWritable(true, false)
+        if(scala.reflect.io.File(Path("%s/public".format(Environment.simple.rootPath.getCanonicalPath))).exists) {
+          val origine = fichierServeur.getAbsolutePath
+          val destination = origine.replaceAll("/contenu/", "/public/contenu/")
+          val commande  = "cp %s %s".format(origine, destination)
+          commande !
+        }
+        """{"location" : "/assets/contenu/images/%s"}""".format(monFichier.filename)
       }
     }.getOrElse("{}")
     Ok(Json.parse(reponse))

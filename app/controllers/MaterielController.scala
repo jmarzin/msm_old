@@ -41,7 +41,7 @@ class MaterielController @Inject() (repo: MaterielRep, val messagesApi: Messages
       Redirect(routes.MaterielController.showMateriel(id)).flashing("warning" -> "Vous n'êtes pas administrateur")
     } else {
       repo.removeById(id)
-      Redirect(routes.MaterielController.listMateriel()).flashing("success" -> "Mot supprimé")
+      Redirect(routes.MaterielController.listMateriel()).flashing("success" -> "Matériel supprimé")
     }
   }
 
