@@ -4,6 +4,7 @@ import org.joda.time.DateTime
 import play.Environment
 import play.api.libs.json.Json
 
+import scala.reflect.io.Path
 import scala.xml.{Elem, XML}
 
 case class Gpx(id: Long, idTrek: Long, titre: String, sousTitre: String, description: String, listeMatos: String, nomFichier: String, altitudeMinimum: Int, altitudeMaximum: Int, ascensionTotale: Int, descenteTotale: Int,
@@ -114,8 +115,14 @@ object Gpx {
       distancesCumuleesPix +:= t.map(d => (d / reduction) toInt)
     }
     val heures = (xml \\ "trk" \\ "time").map(h => new DateTime(h.text).getMillis)
-    heureDebut = new DateTime(heures.reduceLeft(_ min _)).toString()
-    heureFin = new DateTime(heures.reduceLeft(_ max _)).toString()
+    if(heures.isEmpty){
+      heureDebut = ""
+      heureFin = ""
+    } else {
+      heureDebut = new DateTime(heures.reduceLeft(_ min _)).toString()
+      heureFin = new DateTime(heures.reduceLeft(_ max _)).toString()
+    }
+
     val trkpt = (xml \\ "trkpt").map(t => (BigDecimal(t \ "@lat" text) , BigDecimal(t \ "@lon" text)))
     arrivee = trkpt.last
     depart = trkpt.head
@@ -140,9 +147,9 @@ object Gpx {
 
   def fusion(listeFichiersGpx: Seq[String], fichierGpxResultat: String) : Unit = {
     var resultat = ""
-    for(fichier <- listeFichiersGpx) {
+    for (fichier <- listeFichiersGpx) {
       val xml = XML.loadFile("%s/contenu/gpx/randos/%s".format(Environment.simple.rootPath.getAbsolutePath, fichier))
-      if(resultat == ""){
+      if (resultat == "") {
         resultat = xml.toString()
       } else {
         val pattern = "(?s).*(<trk>.*?</trk>).*".r
@@ -153,13 +160,16 @@ object Gpx {
     }
     val xml = XML.loadString(resultat)
     val latitudes = (xml \\ "@lat").map(l => BigDecimal(l.text))
-    val minlat = latitudes reduceLeft(_ min _)
-    val maxlat = latitudes reduceLeft(_ max _)
+    val minlat = latitudes reduceLeft (_ min _)
+    val maxlat = latitudes reduceLeft (_ max _)
     val longitudes = (xml \\ "@lon").map(l => BigDecimal(l.text))
-    val minlon = longitudes reduceLeft(_ min _)
-    val maxlon = longitudes reduceLeft(_ max _)
+    val minlon = longitudes reduceLeft (_ min _)
+    val maxlon = longitudes reduceLeft (_ max _)
     resultat = resultat.replaceAll("(?s)<bounds .*?/>",
       "<bounds maxlat=\"%s\" maxlong=\"%s\" minlat=\"%s\" minlon=\"%s\"/>".format(maxlat, maxlon, minlat, minlon))
-    XML.save("public/gpx/treks/%s".format(fichierGpxResultat), XML.loadString(resultat))
+    XML.save("%s/contenu/gpx/treks/%s".format(Environment.simple.rootPath.getCanonicalPath, fichierGpxResultat), XML.loadString(resultat))
+    if (scala.reflect.io.File(Path("%s/public".format(Environment.simple().rootPath().getCanonicalPath))).exists) {
+      XML.save("%s/public/contenu/gpx/treks/%s".format(Environment.simple.rootPath.getCanonicalPath, fichierGpxResultat), XML.loadString(resultat))
+    }
   }
 }

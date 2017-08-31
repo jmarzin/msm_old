@@ -20,8 +20,10 @@
                                     <div id="mapid@gpx.id" class="mapidL"></div>
                                 </div>
                                 <p> @(gpx.distanceTotale/1000f) km +@gpx.ascensionTotale m -@gpx.descenteTotale m <br> le
-                                    @defining(new DateTime(gpx.heureDebut)) { d =>
-                                        @DateTimeFormat.forPattern("d MMMM yyyy").print(d)
+                                    @if(!gpx.heureDebut.isEmpty) {
+                                        @defining(new DateTime(gpx.heureDebut)) { d =>
+                                            @DateTimeFormat.forPattern("d MMMM yyyy").print(d)
+                                        }
                                     }
                                 </p>
                                 <a href="@routes.GpxController.showGpx(gpx.id)" class="btn btn-primary">En savoir plus</a>

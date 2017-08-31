@@ -30,6 +30,11 @@ class MaterielController @Inject() (repo: MaterielRep, val messagesApi: Messages
     Ok(views.html.materiels.list(materiels))
   }
 
+  def listTrekMateriel(idTrek: Long) = Action { implicit request =>
+    val materiels = repo.listTrekMateriel(idTrek).sortWith(_.poids > _.poids)
+    Ok(views.html.materiels.list(materiels))
+  }
+
   def showMateriel(id: Long) = Action { implicit request =>
     repo.get(id).map { materiel =>
       Ok(views.html.materiels.details(materiel))

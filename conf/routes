@@ -9,6 +9,7 @@ POST       /uploadimage           controllers.Admins.upLoadImage
 
 
 GET        /materiels/list        controllers.MaterielController.listMateriel
+GET        /materiels/list/:id    controllers.MaterielController.listTrekMateriel(id: Long)
 GET        /materiels/new         controllers.MaterielController.newMateriel
 POST       /materiels             controllers.MaterielController.saveMateriel
 GET        /materiels/:id/supp    controllers.MaterielController.deleteMateriel(id: Long)
@@ -27,6 +28,8 @@ GET        /gpx/:id               controllers.GpxController.showGpx(id: Long)
 GET        /gpx/:id/edit          controllers.GpxController.editGpx(id: Long)
 POST       /gpx/:id               controllers.GpxController.updateGpx(id: Long)
 PUT        /gpx/:id               controllers.GpxController.updateGpx(id: Long)
+
+GET        /apropos               controllers.GpxController.apropos
 
 GET        /admin                 controllers.Admins.password
 POST       /admin                 controllers.Admins.checkPassword

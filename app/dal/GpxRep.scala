@@ -10,7 +10,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 
 @Singleton
-class GpxRep @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
+class GpxRep @Inject() (dbConfigProvider: DatabaseConfigProvider,
+                        repoTrekMateriels: TrekMaterielRep)(implicit ec: ExecutionContext) {
 
   val dbConfig = dbConfigProvider.get[JdbcProfile]
 
@@ -64,6 +65,7 @@ class GpxRep @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: E
   def removeById(id: Long): Int = {
     val fut = db.run(gpxs.filter(_.id === id).delete)
     Await.result(fut, 2.seconds)
+    repoTrekMateriels.detache(id)
     annuleTrek(id)
   }
 

@@ -4,12 +4,14 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.JdbcProfile
-import models.Materiel
+import models.{Materiel, TrekMateriel}
+
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 
 @Singleton
-class MaterielRep @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
+class MaterielRep @Inject() (dbConfigProvider: DatabaseConfigProvider,
+                             repoTrekMateriels: TrekMaterielRep)(implicit ec: ExecutionContext) {
 
   val dbConfig = dbConfigProvider.get[JdbcProfile]
 
@@ -60,6 +62,14 @@ class MaterielRep @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit 
   def listAll: Seq[Materiel] = {
     val fut = db.run(materiels.result)
     Await.result(fut, 2.seconds)
+  }
+
+  def listTrekMateriel(idTrek: Long): Seq[Materiel] = {
+    val listeMateriels = repoTrekMateriels.list(idTrek)
+    for(idMat <- listeMateriels) yield {
+      val fut = db.run(materiels.filter(_.id === idMat).result.head)
+      Await.result(fut, 2.seconds)
+    }
   }
 }
 

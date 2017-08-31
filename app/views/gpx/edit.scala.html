@@ -1,4 +1,7 @@
-@(form: Form[GpxForm], id: Option[Long] = None, listeCandidats: Seq[(Long, String, Long)] = null)(implicit session: Session, flash: Flash, messages: Messages)
+@(form: Form[GpxForm],
+        id: Option[Long] = None,
+        listeCandidats: Seq[(Long, String, Long)] = Seq(),
+        listeMateriels: Seq[Materiel] = Seq())(implicit session: Session, flash: Flash, messages: Messages)
 @main() {
   <div class="container">
     <h2></h2>
@@ -33,20 +36,16 @@
           <dt><label for="monFichier">nouveau fichier local</label></dt>
           <dd><input id="monFichier" name="monFichier" type="file"></dd>
         } else {
-          <dl class=" " id="listeFichiers_field">
-            <dt><label for="listeFichiers">listeFichiers</label></dt>
-            <dd>
-              <select id="listeFichiers" name="listeFichiers[]" multiple="multiple">
-                @for(f <- listeCandidats) {
-                  @if(f._3.toString == form("id").value.get) {
-                    <option value="@f._1.toString,@f._2" selected>@f._2</option>
-                    } else {
-                    <option value="@f._1.toString,@f._2">@f._2</option>
-                  }
-                }
-              </select>
-            </dd>
-          </dl>
+            @selectMultiple(
+                form("listeFichiers"),
+                listeCandidats.map(f => (f._1.toString + "," + f._2, f._2)),
+                '_label -> "Sélectionner les tracés à regrouper"
+            )
+            @selectMultiple(
+                form("listeMaterielsTrek"),
+                listeMateriels.map(m => (m.id.toString + "," + m.nom, m.nom)),
+                '_label -> "Sélectionner les matériels emportés"
+            )
         }
         @helper.textarea(form("description"), 'id -> "mytextarea", 'rows -> 15, 'cols -> 100)
       </fieldset>
