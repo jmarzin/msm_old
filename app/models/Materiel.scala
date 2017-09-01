@@ -14,6 +14,8 @@ case class Materiel(id: Long, nom: String, description: String, photo: String, p
       .replaceAll("&ocirc;","ô")
       .replaceAll("&ugrave;","ù")
       .replaceAll("&ucirc;","û")
+      .replaceAll("&rsquo;", "'")
+      .replaceAll("&nbsp;", " ")
     val coupure = desc.indexOf(" ", 120)
     if(coupure == -1) {
       return desc
