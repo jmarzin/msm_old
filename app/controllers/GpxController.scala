@@ -49,17 +49,39 @@ class GpxController @Inject() (repoGpx: GpxRep,
     )(GpxForm.apply)(GpxForm.unapply)
   )
 
-  def listGpx(typegpx: String) = Action { implicit request =>
-    val gpxs = if(typegpx == "T")
+  val taillePage = 20
+
+  def listGpx(typegpx: String, page: Int) = Action { implicit request =>
+    var gpxs = if(typegpx == "T")
                   repoGpx.listAllT.sortWith(_.heureDebut > _.heureDebut)
                else
                   repoGpx.listAllR.sortWith(_.heureDebut > _.heureDebut)
-    Ok(views.html.gpx.list(gpxs, typegpx))
+    var pageAAfficher = page
+    var nbPages = Math.ceil(gpxs.size/taillePage.toFloat).toInt
+    pageAAfficher = pageAAfficher max 1
+    pageAAfficher = pageAAfficher min nbPages
+    if(pageAAfficher != 1) {
+      gpxs = gpxs.drop(taillePage * (pageAAfficher - 1))
+    }
+    if(gpxs.size > taillePage) {
+      gpxs = gpxs.slice(0, taillePage)
+    }
+    Ok(views.html.gpx.list(gpxs, typegpx, pageAAfficher, nbPages))
   }
 
-  def listGpxTrk(id: Long) = Action { implicit request =>
-    val gpxs = repoGpx.listByTrekId(id).sortWith(_.heureDebut < _.heureDebut)
-    Ok(views.html.gpx.list(gpxs, "R"))
+  def listGpxTrk(id: Long, page: Int) = Action { implicit request =>
+    var gpxs = repoGpx.listByTrekId(id).sortWith(_.heureDebut < _.heureDebut)
+    var pageAAfficher = page
+    var nbPages = Math.ceil(gpxs.size/taillePage.toFloat).toInt
+    pageAAfficher = pageAAfficher max 1
+    pageAAfficher = pageAAfficher min nbPages
+    if(pageAAfficher != 1) {
+      gpxs = gpxs.drop(taillePage * (pageAAfficher - 1))
+    }
+    if(gpxs.size > taillePage) {
+      gpxs = gpxs.slice(0, taillePage)
+    }
+    Ok(views.html.gpx.list(gpxs, "R", pageAAfficher, nbPages))
   }
 
   def apropos = Action { implicit request =>
@@ -83,9 +105,9 @@ class GpxController @Inject() (repoGpx: GpxRep,
       repoGpx.get(id).map { gpx =>
         repoGpx.removeById(id)
         if (gpx.typegpx == "R") {
-          Redirect(routes.GpxController.listGpx("R")).flashing("success" -> "Tracé supprimé")
+          Redirect(routes.GpxController.listGpx("R", 1)).flashing("success" -> "Tracé supprimé")
         } else {
-          Redirect(routes.GpxController.listGpx("T")).flashing("success" -> "Tracé supprimé")
+          Redirect(routes.GpxController.listGpx("T", 1)).flashing("success" -> "Tracé supprimé")
         }
       }.getOrElse(NotFound)
     }
@@ -93,7 +115,7 @@ class GpxController @Inject() (repoGpx: GpxRep,
 
   def newGpx(typegpx: String) = Action { implicit request =>
     if(!request.session.get("admin").isDefined) {
-      Redirect(routes.GpxController.listGpx("R")).flashing("warning" -> "Vous n'êtes pas administrateur")
+      Redirect(routes.GpxController.listGpx("R", 1)).flashing("warning" -> "Vous n'êtes pas administrateur")
     } else {
       var listeFichiers = Seq[(Long, String, Long)]()
       var listeMateriels = Seq[Materiel]()
@@ -126,7 +148,7 @@ class GpxController @Inject() (repoGpx: GpxRep,
     //           monFichier le fichier local
     val typegpx = request.body.dataParts("typegpx").head
     if (!request.session.get("admin").isDefined) {
-      Redirect(routes.GpxController.listGpx(typegpx)).flashing("warning" -> "Vous n'êtes pas administrateur")
+      Redirect(routes.GpxController.listGpx(typegpx, 1)).flashing("warning" -> "Vous n'êtes pas administrateur")
     } else {
       val newForm = this.formGpx.bindFromRequest()
       newForm.fold(

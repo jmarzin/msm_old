@@ -1,4 +1,4 @@
-@(gpxs : Seq[Gpx], typegpx: String)(implicit session: Session, flash: Flash, request: RequestHeader)
+@(gpxs : Seq[Gpx], typegpx: String, pageAAffichier: Int, nbPages: Int)(implicit session: Session, flash: Flash, request: RequestHeader)
 @import org.joda.time.DateTime
 @import org.joda.time.format.DateTimeFormat
 @import org.joda.time.format.DateTimeFormatter
@@ -6,6 +6,35 @@
     <div class="container">
         @if(session.get("admin") == Some("true")) {
             <a type="button" class="btn btn-link fa fa-plus" href="@routes.GpxController.newGpx(typegpx)"></a>
+        }
+
+        @if(nbPages > 1) {
+            <nav>
+                <ul class="pagination">
+                    @if(pageAAffichier == 1){
+                        <li class="page-item disabled">
+                    } else {
+                        <li class="page-item">
+                    }
+                        <a class="page-link" href="@routes.GpxController.listGpx(typegpx, pageAAffichier - 1)" tabindex="-1">Prec</a>
+                    </li>
+                    @for(i <- 1 to nbPages) {
+                        @if(i == pageAAffichier) {
+                            <li class="page-item active">
+                                <a class="page-link" href="#">@i<span class="sr-only">(current)</span></a>
+                        } else {
+                            <li class="page-item"><a class="page-link" href="@routes.GpxController.listGpx(typegpx, i)">@i</a></li>
+                        }
+                    }
+                    @if(pageAAffichier == nbPages){
+                        <li class="page-item disabled">
+                    } else {
+                        <li class="page-item">
+                        }
+                    <a class="page-link" href="@routes.GpxController.listGpx(typegpx, pageAAffichier + 1)" tabindex="-1">Suiv</a>
+                </li>
+                </ul>
+            </nav>
         }
         <div class="row">
                 @for(gpx <- gpxs) {

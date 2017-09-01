@@ -76,7 +76,7 @@
         <div id="mapid"></div>
         @Html(gpx.description)
         @if(gpx.typegpx == "T") {
-            <a href="@routes.GpxController.listGpxTrk(gpx.id)" class="btn btn-primary">Liste des étapes</a>
+            <a href="@routes.GpxController.listGpxTrk(gpx.id, 1)" class="btn btn-primary">Liste des étapes</a>
         }
         @if(gpx.idTrek > 0) {
             <a href="@routes.GpxController.showGpx(gpx.idTrek)" class="btn btn-primary">Voir le trek</a>
