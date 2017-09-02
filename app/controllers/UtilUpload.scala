@@ -12,7 +12,7 @@ import scala.reflect.io.{File, Path}
 
 trait UtilUpload {
 
-  def uploadFile(item: String, fichier: String, request: Request[MultipartFormData[Files.TemporaryFile]]) : String = {
+  def uploadFile(item: String, fichier: String, request: Request[MultipartFormData[Files.TemporaryFile]]) : Option[String] = {
     val nomFichier = request.body.file("monFichier").map { monFichier =>
       if (monFichier.filename.isEmpty) {
         fichier
@@ -37,6 +37,10 @@ trait UtilUpload {
         monFichier.filename.replaceAll(" ","_")
       }
     }.getOrElse(fichier)
-    nomFichier
+    if(nomFichier.isEmpty) {
+      None
+    } else {
+      Some(nomFichier)
+    }
   }
 }

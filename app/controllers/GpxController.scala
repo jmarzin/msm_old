@@ -159,7 +159,7 @@ class GpxController @Inject() (repoGpx: GpxRep,
         success = { newGpx =>
           var idx = 0L
           if(newForm.data("typegpx") == "R") {
-            val nomFichier = uploadFile("gpx", newForm.data("listeFichiers"), request)
+            val nomFichier = uploadFile("gpx", newForm.data("listeFichiers"), request).getOrElse("")
             if (nomFichier == "") {
               idx = repoGpx.add(Gpx(newGpx.id, newGpx.idTrek, newGpx.titre, newGpx.sousTitre, newGpx.description, newGpx.listeMatos,
                 nomFichier, newGpx.altitudeMinimum, newGpx.altitudeMaximum, newGpx.ascensionTotale, newGpx.descenteTotale,
@@ -250,7 +250,7 @@ class GpxController @Inject() (repoGpx: GpxRep,
         },
         success = { gpx =>
           if(newForm.data("typegpx") == "R") {
-            val nomFichier = uploadFile("gpx", newForm.data("listeFichiers"), request)
+            val nomFichier = uploadFile("gpx", newForm.data("listeFichiers"), request).getOrElse(gpx.nomFichier)
             if (repoGpx.get(id).get.nomFichier == nomFichier || nomFichier.isEmpty)
               repoGpx.update(Gpx(gpx.id, gpx.idTrek, gpx.titre, gpx.sousTitre, gpx.description, gpx.listeMatos,
                 nomFichier, gpx.altitudeMinimum, gpx.altitudeMaximum, gpx.ascensionTotale, gpx.descenteTotale,

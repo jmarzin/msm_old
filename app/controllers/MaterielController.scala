@@ -69,7 +69,7 @@ class MaterielController @Inject() (repo: MaterielRep, val messagesApi: Messages
       Redirect(routes.MaterielController.listMateriel()).flashing("warning" -> "Vous n'êtes pas administrateur")
     } else {
       val newForm = this.formMateriel.bindFromRequest()
-      val nomImage = uploadFile("matos", newForm.data("photo"), request)
+      val nomImage = uploadFile("matos", newForm.data("photo"), request).getOrElse("")
       newForm.fold(
         hasErrors = { form =>
           Redirect(routes.MaterielController.newMateriel).flashing(Flash(form.data) +
@@ -99,7 +99,7 @@ class MaterielController @Inject() (repo: MaterielRep, val messagesApi: Messages
       Redirect(routes.MaterielController.showMateriel(id)).flashing("warning" -> "Vous n'êtes pas administrateur")
     } else {
       val newForm = this.formMateriel.bindFromRequest()
-      val nomImage = uploadFile("matos", newForm.data("photo"), request)
+      val nomImage = uploadFile("matos", newForm.data("photo"), request).getOrElse("")
       newForm.fold(
         hasErrors = { form =>
           Ok(views.html.materiels.edit(form, Option(id))).flashing(Flash(form.data) +
