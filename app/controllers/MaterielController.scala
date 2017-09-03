@@ -25,6 +25,13 @@ class MaterielController @Inject() (repo: MaterielRep, val messagesApi: Messages
       )(Materiel.apply)(Materiel.unapply)
     )
 
+  def cleanUserForm(data: Map[String, Seq[String]], nouveauFichier: String): Map[String, Seq[String]] = {
+    data.map{ case (key, values) =>
+      if(key == "photo") (key, values.map(s => nouveauFichier)) // trim whitespace from email
+      else (key, values)
+    }
+  }
+
   def listMateriel = Action { implicit request =>
     val materiels = repo.listAll.sortWith(_.poids > _.poids)
     Ok(views.html.materiels.list(materiels))
@@ -68,8 +75,14 @@ class MaterielController @Inject() (repo: MaterielRep, val messagesApi: Messages
     if (!request.session.get("admin").isDefined) {
       Redirect(routes.MaterielController.listMateriel()).flashing("warning" -> "Vous n'êtes pas administrateur")
     } else {
-      val newForm = this.formMateriel.bindFromRequest()
-      val nomImage = uploadFile("matos", newForm.data("photo"), request).getOrElse("")
+      val nomImage = uploadFile("matos", request.body.dataParts.get("photo").get.head, request).getOrElse("")
+      val newForm = if(nomImage.isEmpty) {
+        this.formMateriel.bindFromRequest()
+      } else {
+        val incomingData = request.body.dataParts
+        val cleanData = cleanUserForm(incomingData, nomImage)
+        this.formMateriel.bindFromRequest(cleanData)
+      }
       newForm.fold(
         hasErrors = { form =>
           Redirect(routes.MaterielController.newMateriel).flashing(Flash(form.data) +
@@ -98,8 +111,14 @@ class MaterielController @Inject() (repo: MaterielRep, val messagesApi: Messages
     if (!request.session.get("admin").isDefined) {
       Redirect(routes.MaterielController.showMateriel(id)).flashing("warning" -> "Vous n'êtes pas administrateur")
     } else {
-      val newForm = this.formMateriel.bindFromRequest()
-      val nomImage = uploadFile("matos", newForm.data("photo"), request).getOrElse("")
+      val nomImage = uploadFile("matos", request.body.dataParts.get("photo").get.head, request).getOrElse("")
+      val newForm = if(nomImage.isEmpty) {
+        this.formMateriel.bindFromRequest()
+      } else {
+        val incomingData = request.body.dataParts
+        val cleanData = cleanUserForm(incomingData, nomImage)
+        this.formMateriel.bindFromRequest(cleanData)
+      }
       newForm.fold(
         hasErrors = { form =>
           Ok(views.html.materiels.edit(form, Option(id))).flashing(Flash(form.data) +

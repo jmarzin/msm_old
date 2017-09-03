@@ -15,7 +15,10 @@
                 </div>
                 @helper.select(form("photo")
                     ,new java.io.File("%s/contenu/images/matos/"
-                            .format(Environment.simple.rootPath.getCanonicalPath)).listFiles.map(f => f.getName).filter(_.toLowerCase.endsWith(".jpg")).map(f => (f,f)).toSeq)
+                            .format(Environment.simple.rootPath.getCanonicalPath))
+                            .listFiles.map(f => f.getName)
+                            .filter(f => Seq(".jpg",".gif",".png").contains(f.substring(f.size-4, f.size).toLowerCase))
+                            .map(f => (f,f)).toSeq)
                 <input name="monFichier" type="file">
                 @helper.textarea(form("description"), 'id -> "mytextarea", 'rows -> 15, 'cols -> 100)
                 @helper.inputText(form("poids"))
